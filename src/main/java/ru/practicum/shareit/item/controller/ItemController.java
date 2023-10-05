@@ -26,38 +26,39 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto postItem(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+    public ItemDto postItem(@RequestHeader(value = "X-Sharer-User-Id", required = true) long userId,
                             @RequestBody @Valid ItemDto itemDto) {
         return itemService.postItem(userId, itemDto);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto postComment(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+    public CommentDto postComment(@RequestHeader(value = "X-Sharer-User-Id", required = true) long userId,
                                   @PathVariable long itemId,
                                   @RequestBody @Valid CommentDto commentDto) {
         return itemService.postComment(userId, itemId, commentDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+    public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = true) long userId,
                               @RequestBody ItemDto itemDto,
                               @PathVariable long itemId) throws JsonMappingException {
         return itemService.partiallyUpdateItem(userId, itemId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithBookingsAndCommentsDto getItemById(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+    public ItemWithBookingsAndCommentsDto getItemById(@RequestHeader(value = "X-Sharer-User-Id", required = true) long userId,
                                                       @PathVariable long itemId) {
         return itemService.getItemByIdAnyUser(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemWithBookingsAndCommentsDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId) {
+    public List<ItemWithBookingsAndCommentsDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id", required = true)
+                                                                long userId) {
         return itemService.getAllItemsOwner(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
+    public List<ItemDto> searchItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) long userId,
                                     @RequestParam (required = true)  String text) {
         return itemService.searchItem(userId, text);
     }
