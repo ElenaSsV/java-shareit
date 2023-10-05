@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     private Long id;
+    @NotBlank
     private String name;
     @Email
     @NotBlank
