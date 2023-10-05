@@ -29,9 +29,6 @@ public class ItemController {
     @PostMapping
     public ItemDto postItem(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
                             @RequestBody @Valid ItemDto itemDto) {
-        if (userId == null) {
-            throw new IllegalOperationException("UserId cannot be null");
-        }
         return itemService.postItem(userId, itemDto);
     }
 
