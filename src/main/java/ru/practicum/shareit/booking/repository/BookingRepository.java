@@ -13,17 +13,15 @@ import java.util.Set;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+    List<Booking> findByBooker_IdAndStatusOrderByStartDesc(Long bookerId, BookingStatus status);
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     Optional<Booking> findByIdAndItemOwnerId(long bookingId, long ownerId);
-
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     List<Booking> findByBooker_IdOrderByStartDesc(Long bookerId);
 
     List<Booking> findByBooker_IdAndEndIsBeforeOrderByStartDesc(Long bookerId, LocalDateTime end);
 
     List<Booking> findByBooker_IdAndStartIsAfterOrderByStartDesc(Long bookerId, LocalDateTime start);
-
-    List<Booking> findByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(Long bookerId, LocalDateTime start,
-                                                                              LocalDateTime end);
-    List<Booking> findByBooker_IdAndStatusOrderByStartDesc(Long bookerId, BookingStatus status);
 
     @Query("select b from Booking b where b.item.owner.id = ?1 order by b.start desc")
     List<Booking> findByOwner_IdOrderByStartDesc(Long ownerId);
@@ -43,5 +41,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByItemIdInOrderByStartDesc(Set<Long> ids);
 
     Boolean existsBookingByItemIdAndBookerIdAndEndIsBefore(long itemId, long userId, LocalDateTime now);
+
+    List<Booking> findByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(Long bookerId, LocalDateTime start, LocalDateTime end);
 
 }
