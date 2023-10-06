@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class ItemWithBookingsAndCommentsDto {
     private Long id;
     @NotBlank

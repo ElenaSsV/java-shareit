@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
  * TODO Sprint add-controllers.
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemDto {
     private Long id;
     @NotBlank
