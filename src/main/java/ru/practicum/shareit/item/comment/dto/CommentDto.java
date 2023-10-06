@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.comment.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 public class CommentDto {
@@ -11,5 +11,5 @@ public class CommentDto {
     @NotBlank
     private String text;
     private String authorName;
-    private Instant created = Instant.now();
+    private LocalDateTime created = LocalDateTime.now();
 }

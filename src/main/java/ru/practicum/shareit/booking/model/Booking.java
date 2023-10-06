@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Data
+@Table(name = "bookings")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +22,10 @@ public class Booking {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
     @ManyToOne
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
     @ManyToOne
-    @JoinColumn(name = "booker_id")
+    @JoinColumn(name = "booker_id", nullable = false)
     private User booker;
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
