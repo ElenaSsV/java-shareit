@@ -9,7 +9,7 @@ import javax.persistence.*;
  * TODO Sprint add-controllers.
  */
 @Entity
-@Table(name = "items")
+@Table(name = "items", schema = "PUBLIC")
 @Data
 public class Item {
     @Id

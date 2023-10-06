@@ -20,7 +20,7 @@ public class Comment {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
     @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
