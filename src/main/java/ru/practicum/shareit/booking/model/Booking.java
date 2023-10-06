@@ -27,5 +27,5 @@ public class Booking {
     @JoinColumn(name = "booker_id")
     private User booker;
     @Enumerated(EnumType.STRING)
-    private BookingStatus status = BookingStatus.WAITING;
+    private BookingStatus status;
 }

@@ -101,14 +101,12 @@ public class ItemServiceImpl implements ItemService {
         Item searchedItem = itemRepository.findById(itemId).orElseThrow(() -> {
             throw new NotFoundException("Item with id " + itemId + " is not found");
         });
-
-        List<Booking> bookings = bookingRepository.findByItemIdInOrderByStartDesc(Set.of(searchedItem.getId()));
         Optional<BookingToItemDto> last = Optional.empty();
         Optional<BookingToItemDto> next = Optional.empty();
 
         List<Comment> comments = commentRepository.findCommentsByItemIdIn(Set.of(itemId));
-
         if (userId == searchedItem.getOwner().getId()) {
+            List<Booking> bookings = bookingRepository.findByItem_IdIn(Set.of(searchedItem.getId()));
             last = getLastBooking(bookings);
             next = getNextBooking(bookings);
         }
@@ -124,7 +122,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .collect(Collectors.toMap(Item::getId, Function.identity()));
 
-        Map<Long, List<Booking>> bookingsMap = bookingRepository.findByItemIdInOrderByStartDesc(itemMap.keySet())
+        Map<Long, List<Booking>> bookingsMap = bookingRepository.findByItem_IdIn(itemMap.keySet())
                 .stream()
                 .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
 

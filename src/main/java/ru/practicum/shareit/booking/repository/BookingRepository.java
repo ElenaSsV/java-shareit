@@ -38,7 +38,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = ?2 order by b.start desc")
     List<Booking> findByOwner_IdAndStatus(Long ownerId, BookingStatus status);
 
-    List<Booking> findByItemIdInOrderByStartDesc(Set<Long> ids);
+    List<Booking> findByItem_IdIn(Set<Long> ids);
 
     Boolean existsBookingByItemIdAndBookerIdAndEndIsBefore(long itemId, long userId, LocalDateTime now);
 

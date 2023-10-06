@@ -22,5 +22,4 @@ public class RequestBookingDto {
     private LocalDateTime end;
     @NotNull
     private Long itemId;
-    private User booker;
 }
