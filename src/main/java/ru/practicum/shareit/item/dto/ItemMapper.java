@@ -20,10 +20,6 @@ public class ItemMapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.getAvailable());
-
-        if (item.getRequest() != null) {
-            itemDto.setRequestId(item.getRequest().getId());
-        }
         return itemDto;
     }
 
@@ -40,10 +36,6 @@ public class ItemMapper {
         last.ifPresent(itemDto::setLastBooking);
         next.ifPresent(itemDto::setNextBooking);
         itemDto.setComments(comments);
-
-        if (item.getRequest() != null) {
-            itemDto.setRequestId(item.getRequest().getId());
-        }
         return itemDto;
     }
 

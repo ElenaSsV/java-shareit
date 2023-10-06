@@ -18,7 +18,7 @@ public class ItemWithBookingsAndCommentsDto {
     private String description;
     @NotNull
     private Boolean available;
-    private Long requestId;
+//    private Long requestId;
     private BookingToItemDto lastBooking;
     private BookingToItemDto nextBooking;
     private List<CommentDto> comments;
