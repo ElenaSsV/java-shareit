@@ -1,12 +1,11 @@
 package ru.practicum.shareit.booking.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import ru.practicum.shareit.booking.dto.ResponseBookingDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.booking.dto.RequestBooking;
+import ru.practicum.shareit.booking.dto.ResponseBooking;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.BookingStateValidationException;
 
 import javax.validation.Valid;
@@ -20,33 +19,32 @@ import java.util.List;
 public class BookingController {
     private final BookingService bookingService;
 
-    @Autowired
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 
     @PostMapping
-    public ResponseBookingDto postBooking(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
-                                          @RequestBody @Valid RequestBookingDto bookingDto) {
+    public ResponseBooking postBooking(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+                                       @RequestBody @Valid RequestBooking bookingDto) {
         return bookingService.postBooking(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseBookingDto updateBookingStatus(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
-                                                  @RequestParam("approved") Boolean isApproved,
-                                                  @PathVariable long bookingId) throws JsonMappingException {
+    public ResponseBooking updateBookingStatus(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+                                               @RequestParam("approved") Boolean isApproved,
+                                               @PathVariable long bookingId) throws JsonMappingException {
         return bookingService.updateBookingStatus(userId, isApproved, bookingId);
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseBookingDto getItemById(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
-                                          @PathVariable long bookingId) {
+    public ResponseBooking getItemById(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+                                       @PathVariable long bookingId) {
         return bookingService.getBookingById(userId, bookingId);
     }
 
     @GetMapping
-    public List<ResponseBookingDto> getAllByBooker(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
-                                                   @RequestParam(value = "state", defaultValue = "ALL", required = false)
+    public List<ResponseBooking> getAllByBooker(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+                                                @RequestParam(value = "state", defaultValue = "ALL", required = false)
                                                    String state) {
         BookingState bookingState;
         try {
@@ -58,8 +56,8 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<ResponseBookingDto> getAllByItemOwner(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
-                                                      @RequestParam(value = "state", defaultValue = "ALL", required = false)
+    public List<ResponseBooking> getAllByItemOwner(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
+                                                   @RequestParam(value = "state", defaultValue = "ALL", required = false)
                                                       String state) {
         BookingState bookingState;
         try {

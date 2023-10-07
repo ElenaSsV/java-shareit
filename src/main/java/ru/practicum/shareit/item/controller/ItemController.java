@@ -1,11 +1,10 @@
 package ru.practicum.shareit.item.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemWithBookingsAndCommentsDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsAndComments;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -20,7 +19,6 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @Autowired
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
@@ -46,13 +44,13 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithBookingsAndCommentsDto getItemById(@RequestHeader(value = "X-Sharer-User-Id", required = true) long userId,
-                                                      @PathVariable long itemId) {
+    public ItemWithBookingsAndComments getItemById(@RequestHeader(value = "X-Sharer-User-Id", required = true) long userId,
+                                                   @PathVariable long itemId) {
         return itemService.getItemByIdAnyUser(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemWithBookingsAndCommentsDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id", required = true)
+    public List<ItemWithBookingsAndComments> getAllItems(@RequestHeader(value = "X-Sharer-User-Id", required = true)
                                                             long userId) {
         return itemService.getAllItemsOwner(userId);
     }

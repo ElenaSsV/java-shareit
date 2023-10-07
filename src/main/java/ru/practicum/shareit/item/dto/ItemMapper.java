@@ -24,18 +24,18 @@ public class ItemMapper {
         return itemDto;
     }
 
-    public static ItemWithBookingsAndCommentsDto toItemWithBookingsAndCommentsDto(Item item, Optional<Booking> last,
-                                                                                  Optional<Booking> next,
-                                                                                  List<CommentDto> comments) {
-        ItemWithBookingsAndCommentsDto itemDto = new ItemWithBookingsAndCommentsDto();
+    public static ItemWithBookingsAndComments toItemWithBookingsAndCommentsDto(Item item, Optional<Booking> last,
+                                                                               Optional<Booking> next,
+                                                                               List<CommentDto> comments) {
+        ItemWithBookingsAndComments itemDto = new ItemWithBookingsAndComments();
         if (item.getId() != null) {
             itemDto.setId(item.getId());
         }
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.getAvailable());
-        last.ifPresent(booking -> itemDto.setLastBooking(BookingMapper.toBookingToItemDto(booking)));
-        next.ifPresent(booking -> itemDto.setNextBooking(BookingMapper.toBookingToItemDto(booking)));
+        last.ifPresent(booking -> itemDto.setLastBooking(BookingMapper.toBookingDto(booking)));
+        next.ifPresent(booking -> itemDto.setNextBooking(BookingMapper.toBookingDto(booking)));
         itemDto.setComments(comments);
         return itemDto;
     }

@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -17,7 +16,7 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.comment.repository.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemWithBookingsAndCommentsDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsAndComments;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -38,8 +37,6 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-
-    @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, ObjectMapper objectMapper, UserRepository userRepository,
                            BookingRepository bookingRepository, CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
@@ -92,9 +89,8 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(itemRepository.save(itemToUpdate));
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public ItemWithBookingsAndCommentsDto getItemByIdAnyUser(long userId, long itemId) {
+    public ItemWithBookingsAndComments getItemByIdAnyUser(long userId, long itemId) {
         log.info("Retrieving item with id {} by user with id {}", itemId, userId);
         Item searchedItem = itemRepository.findById(itemId).orElseThrow(() -> {
             throw new NotFoundException("Item with id " + itemId + " is not found");
@@ -113,9 +109,8 @@ public class ItemServiceImpl implements ItemService {
                 CommentMapper.toCommentDtoList(comments));
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public List<ItemWithBookingsAndCommentsDto> getAllItemsOwner(long userId) {
+    public List<ItemWithBookingsAndComments> getAllItemsOwner(long userId) {
         log.info("Retrieving all items by owner with id {}", userId);
         Map<Long, Item> itemMap = itemRepository.findItemByOwnerId(userId)
                 .stream()
@@ -137,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+
     @Override
     public List<ItemDto> searchItem(long userId, String text) {
         log.info("Searching item which contains {}", text);
@@ -163,11 +158,10 @@ public class ItemServiceImpl implements ItemService {
         if (bookings.isEmpty()) {
             return Optional.empty();
         }
-        Comparator<Booking> comparator = Comparator.comparing(Booking::getStart);
         return bookings.stream()
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now())
                         && !booking.getStatus().equals(BookingStatus.REJECTED))
-                .min(comparator);
+                .min(Comparator.comparing(Booking::getStart));
     }
 
 }

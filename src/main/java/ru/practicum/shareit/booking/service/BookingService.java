@@ -1,20 +1,20 @@
 package ru.practicum.shareit.booking.service;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import ru.practicum.shareit.booking.dto.ResponseBookingDto;
+import ru.practicum.shareit.booking.dto.RequestBooking;
+import ru.practicum.shareit.booking.dto.ResponseBooking;
 import ru.practicum.shareit.booking.dto.BookingState;
 
 import java.util.List;
 
 public interface BookingService {
-    ResponseBookingDto postBooking(long bookerId, RequestBookingDto bookingDto);
+    ResponseBooking postBooking(long bookerId, RequestBooking bookingDto);
 
-    ResponseBookingDto updateBookingStatus(long userId, boolean isApproved, long bookingId) throws JsonMappingException;
+    ResponseBooking updateBookingStatus(long userId, boolean isApproved, long bookingId) throws JsonMappingException;
 
-    ResponseBookingDto getBookingById(long userId, long bookingId);
+    ResponseBooking getBookingById(long userId, long bookingId);
 
-    List<ResponseBookingDto> getAllBookingsByBooker(BookingState bookingState, long userId);
+    List<ResponseBooking> getAllBookingsByBooker(BookingState bookingState, long userId);
 
-    List<ResponseBookingDto> getAllBookingsByItemOwner(BookingState bookingState, long userId);
+    List<ResponseBooking> getAllBookingsByItemOwner(BookingState bookingState, long userId);
 }

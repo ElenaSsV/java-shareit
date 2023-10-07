@@ -12,7 +12,7 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingMapper {
-    public static Booking toBooking(RequestBookingDto bookingDto) {
+    public static Booking toBooking(RequestBooking bookingDto) {
         Booking booking = new Booking();
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
@@ -20,8 +20,8 @@ public class BookingMapper {
         return booking;
     }
 
-    public static ResponseBookingDto toResponseBookingDto(Booking booking) {
-        ResponseBookingDto bookingDto = new ResponseBookingDto();
+    public static ResponseBooking toResponseBooking(Booking booking) {
+        ResponseBooking bookingDto = new ResponseBooking();
         bookingDto.setId(booking.getId());
         bookingDto.setStart(booking.getStart());
         bookingDto.setEnd(booking.getEnd());
@@ -31,16 +31,16 @@ public class BookingMapper {
         return bookingDto;
     }
 
-    public static List<ResponseBookingDto> bookingDtoList(Iterable<Booking> bookings) {
-        List<ResponseBookingDto> dtos = new ArrayList<>();
+    public static List<ResponseBooking> toResponseBookingList(Iterable<Booking> bookings) {
+        List<ResponseBooking> dtos = new ArrayList<>();
         for (Booking booking : bookings) {
-            dtos.add(toResponseBookingDto(booking));
+            dtos.add(toResponseBooking(booking));
         }
         return dtos;
     }
 
-    public static BookingToItemDto toBookingToItemDto(Booking booking) {
-        BookingToItemDto dto = new BookingToItemDto();
+    public static BookingDto toBookingDto(Booking booking) {
+        BookingDto dto = new BookingDto();
         dto.setId(booking.getId());
         dto.setStart(booking.getStart());
         dto.setEnd(booking.getEnd());

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -25,7 +24,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
-    @Autowired
     public UserServiceImpl(UserRepository userRepository, ObjectMapper objectMapper) {
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
@@ -65,7 +63,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(long userId) {
         log.info("Retrieving user with id {}", userId);
@@ -73,7 +70,6 @@ public class UserServiceImpl implements UserService {
                 new NotFoundException("User with id " + userId + " is not found")));
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers() {
         log.info("Getting all users");

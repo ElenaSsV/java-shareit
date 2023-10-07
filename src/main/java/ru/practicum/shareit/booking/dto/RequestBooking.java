@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
  * TODO Sprint add-bookings.
  */
 @Data
-public class RequestBookingDto {
-    private long id;
+public class RequestBooking {
     @FutureOrPresent
     @NotNull
     private LocalDateTime start;
