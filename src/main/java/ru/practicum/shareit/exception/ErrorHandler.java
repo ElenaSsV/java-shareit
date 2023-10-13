@@ -27,7 +27,23 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         log.info("Exception: " + e.getMessage());
-        return new ErrorResponse("Произошла непредвиденная ошибка");
+        return new ErrorResponse("Произошла непредвиденная ошибка: " + e.getMessage());
+    }
+
+    @ExceptionHandler(BookingStateValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse onBookingStateValidationException(BookingStateValidationException e) {
+        log.info("Incorrect state: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalOperationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse onIllegalOperationException(IllegalOperationException e) {
+        log.info("Operation is not allowed: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
