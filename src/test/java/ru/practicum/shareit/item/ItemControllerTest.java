@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureMockMvc
-class ItemControllerTest {
+public class ItemControllerTest {
 
     @MockBean
     private ItemService itemService;

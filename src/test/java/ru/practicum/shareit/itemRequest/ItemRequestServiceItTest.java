@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.notNullValue;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class ItemRequestServiceItTest {
+public class ItemRequestServiceItTest {
 
     private final EntityManager em;
     private final ItemRequestServiceImpl requestService;

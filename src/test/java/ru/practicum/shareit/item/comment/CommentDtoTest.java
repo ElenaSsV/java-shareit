@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class CommentDtoTest {
+public class CommentDtoTest {
 
     @Autowired
     private JacksonTester<CommentDto> json;

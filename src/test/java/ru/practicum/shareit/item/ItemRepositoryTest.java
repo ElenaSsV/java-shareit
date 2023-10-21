@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ItemRepositoryTest {
+public class ItemRepositoryTest {
     @Autowired
     private TestEntityManager em;
     @Autowired

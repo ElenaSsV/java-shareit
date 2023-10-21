@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class ResponseBookingDtoTest {
+public class ResponseBookingDtoTest {
 
     @Autowired
     private JacksonTester<ResponseBooking> json;
