@@ -17,7 +17,7 @@ public interface ItemService {
 
     ItemWithBookingsAndComments getItemByIdAnyUser(long userId, long itemId);
 
-    List<ItemWithBookingsAndComments> getAllItemsOwner(long userId);
+    List<ItemWithBookingsAndComments> getAllItemsOwner(long userId, int from, int size);
 
-    List<ItemDto> searchItem(long userId, String text);
+    List<ItemDto> searchItem(long userId, String text, int from, int size);
 }

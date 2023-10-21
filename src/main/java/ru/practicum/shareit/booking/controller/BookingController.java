@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.BookingStateValidationException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -45,26 +46,30 @@ public class BookingController {
     @GetMapping
     public List<ResponseBooking> getAllByBooker(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
                                                 @RequestParam(value = "state", defaultValue = "ALL", required = false)
-                                                   String state) {
+                                                   String state,
+                                                @Positive @RequestParam(defaultValue = "0") int from,
+                                                @Positive @RequestParam(defaultValue = "10") int size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new BookingStateValidationException("Unknown state: " + state);
         }
-        return bookingService.getAllBookingsByBooker(bookingState, userId);
+        return bookingService.getAllBookingsByBooker(bookingState, userId, from, size);
     }
 
     @GetMapping("/owner")
     public List<ResponseBooking> getAllByItemOwner(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long userId,
                                                    @RequestParam(value = "state", defaultValue = "ALL", required = false)
-                                                      String state) {
+                                                      String state,
+                                                   @Positive @RequestParam(defaultValue = "0") int from,
+                                                   @Positive @RequestParam(defaultValue = "10") int size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new BookingStateValidationException("Unknown state: " + state);
         }
-        return bookingService.getAllBookingsByItemOwner(bookingState, userId);
+        return bookingService.getAllBookingsByItemOwner(bookingState, userId, from, size);
     }
 }

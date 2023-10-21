@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,8 +58,7 @@ public class BookingServiceImpl implements BookingService {
         bookingToPost.setItem(itemToBook);
 
         log.info("Saving booking {}", bookingToPost);
-        Booking postedBooking = bookingRepository.save(bookingToPost);
-        return BookingMapper.toResponseBooking(postedBooking);
+        return BookingMapper.toResponseBooking(bookingRepository.save(bookingToPost));
     }
 
     @Transactional
@@ -96,8 +97,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<ResponseBooking> getAllBookingsByBooker(BookingState bookingState, long userId) {
+    public List<ResponseBooking> getAllBookingsByBooker(BookingState bookingState, long userId, int from, int size) {
         log.info("Retrieving bookings by user with id {} and state {}", userId, bookingState);
+
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("From cannot be less than zero & size cannot be less or equal zero");
+        }
+
+        PageRequest page = PageRequest.of(from / size, size);
 
         if (!userRepository.existsUserById(userId)) {
             throw new NotFoundException("User with id " + userId + " is not found");
@@ -106,45 +113,57 @@ public class BookingServiceImpl implements BookingService {
         switch (bookingState) {
             case PAST:
                 return BookingMapper.toResponseBookingList(bookingRepository.findByBooker_IdAndEndIsBeforeOrderByStartDesc(userId,
-                        LocalDateTime.now()));
+                        LocalDateTime.now(), page));
             case CURRENT:
                 return BookingMapper.toResponseBookingList(bookingRepository
                         .findByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(),
-                                LocalDateTime.now()));
+                                LocalDateTime.now(), page));
             case FUTURE:
                 return BookingMapper.toResponseBookingList(bookingRepository.findByBooker_IdAndStartIsAfterOrderByStartDesc(userId,
-                        LocalDateTime.now()));
+                        LocalDateTime.now(), page));
             case WAITING:
                 return BookingMapper.toResponseBookingList(bookingRepository.findByBooker_IdAndStatusOrderByStartDesc(userId,
-                        BookingStatus.WAITING));
+                        BookingStatus.WAITING, page));
             case REJECTED:
                 return BookingMapper.toResponseBookingList(bookingRepository.findByBooker_IdAndStatusOrderByStartDesc(userId,
-                        BookingStatus.REJECTED));
+                        BookingStatus.REJECTED, page));
             default:
-                return BookingMapper.toResponseBookingList(bookingRepository.findByBooker_IdOrderByStartDesc(userId));
+                return BookingMapper.toResponseBookingList(bookingRepository.findByBooker_IdOrderByStartDesc(userId, page));
         }
     }
 
     @Override
-    public List<ResponseBooking> getAllBookingsByItemOwner(BookingState bookingState, long userId) {
+    public List<ResponseBooking> getAllBookingsByItemOwner(BookingState bookingState, long userId, int from, int size) {
+        log.info("Retrieving bookings by user with id {} and state {}", userId, bookingState);
+
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("From cannot be less than zero & size cannot be less or equal zero");
+        }
+
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+
         if (!userRepository.existsUserById(userId)) {
             throw new NotFoundException("User with id " + userId + " is not found");
         }
 
         switch (bookingState) {
             case PAST:
-                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStatePast(userId, LocalDateTime.now()));
+                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStatePast(userId,
+                        LocalDateTime.now(), page));
             case CURRENT:
                 return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStateCurrent(userId,
-                        LocalDateTime.now(), LocalDateTime.now()));
+                        LocalDateTime.now(), LocalDateTime.now(), page));
             case FUTURE:
-                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStateFuture(userId, LocalDateTime.now()));
+                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStateFuture(userId,
+                        LocalDateTime.now(), page));
             case WAITING:
-                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStatus(userId, BookingStatus.WAITING));
+                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStatus(userId,
+                        BookingStatus.WAITING, page));
             case REJECTED:
-                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStatus(userId, BookingStatus.REJECTED));
+                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdAndStatus(userId,
+                        BookingStatus.REJECTED, page));
             default:
-                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdOrderByStartDesc(userId));
+                return BookingMapper.toResponseBookingList(bookingRepository.findByOwner_IdOrderByStartDesc(userId, page));
         }
     }
 }
