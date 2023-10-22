@@ -28,7 +28,7 @@ public class UserServiceItTest {
     private final UserService service;
 
     @Test
-    public void saveUser() {
+    public void postUser() {
         UserDto userDto = UserMapper.toUserDto(getTestUser1());
         service.postUser(userDto);
 
@@ -41,7 +41,7 @@ public class UserServiceItTest {
     }
 
     @Test
-    public void updateUser() throws JsonMappingException {
+    public void partiallyUpdateUser() throws JsonMappingException {
         User user = getTestUser1();
 
         em.createNativeQuery("insert into users (name, email) values (?, ?)")

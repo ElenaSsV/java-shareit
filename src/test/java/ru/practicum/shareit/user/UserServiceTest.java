@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,23 +32,36 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @Test
-    public void postUser_thenUserWithSameEmailExists_thenUniqueEmailExceptionThrown() {
+    public void postUser_whenUserWithSameEmailExists_thenUniqueEmailExceptionThrown() {
         Mockito.when(userRepository.save(Mockito.any(User.class)))
-                .thenThrow(new UniqueEmailException("Email should be unique"));
+                .thenThrow(ConstraintViolationException.class);
         UniqueEmailException uniqueEmailException = assertThrows(UniqueEmailException.class,
                 () -> userService.postUser(UserMapper.toUserDto(getTestUser1())));
     }
 
     @Test
+    public void partiallyUpdateUser_whenUserNotFound_thenNotFoundExceptionThrown() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        NotFoundException notFoundException = assertThrows(NotFoundException.class,
+                () -> userService.partiallyUpdateUser(1, UserMapper.toUserDto(getTestUser1())));
+    }
+
+    @Test
+    public void deleteUserById() {
+       userService.deleteUserById(1);
+    }
+
+    @Test
     public void getUserById_whenNoUser_thenNotFoundExceptionThrown() {
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenThrow(NotFoundException.class);
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
         NotFoundException notFoundException = assertThrows(NotFoundException.class,
                 () -> userService.getUserById(1));
     }
 
     @Test
-    public void getUserById() {
+    public void getUserById_whenUserIdIsCorrect_thenSuccess() {
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(getTestUser1()));
         Optional<User> actualUser = userRepository.findById(1L);
 
