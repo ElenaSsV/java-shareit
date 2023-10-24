@@ -140,8 +140,8 @@ public class ItemControllerTest {
         mvc.perform(get("/items/search")
                         .header("X-Sharer-User-Id", 1)
                         .param("text", ""))
-                .andExpect(status().isInternalServerError());
-        verify(itemService, never()).searchItem(1, "", 0, 10);
+                .andExpect(status().isOk());
+        verify(itemService).searchItem(1, "", 0, 10);
     }
 
     @Test

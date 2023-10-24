@@ -8,7 +8,6 @@ import ru.practicum.shareit.item.dto.ItemWithBookingsAndComments;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.util.List;
 
 /**
@@ -64,9 +63,6 @@ public class ItemController {
                                     @RequestParam (required = true)  String text,
                                     @RequestParam(defaultValue = "0") int from,
                                     @RequestParam(defaultValue = "10") int size) {
-        if (text.isEmpty() || text.isBlank()) {
-            throw new ValidationException("Text cannot be empty");
-        }
         return itemService.searchItem(userId, text, from, size);
     }
 }
