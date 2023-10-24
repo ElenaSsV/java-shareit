@@ -27,7 +27,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -69,19 +69,21 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.description", is(responseRequest.getDescription())))
                 .andExpect(jsonPath("$.created", is(responseRequest.getCreated()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:SS")))));
+        verify(itemRequestService).postRequest(1, requestDto);
     }
 
     @Test
     public void postRequest_whenDescriptionIsEmpty_thenThrowException() throws Exception {
-        responseRequest.setDescription("");
+        requestDto.setDescription("");
 
         mvc.perform(post("/requests")
-                        .content(mapper.writeValueAsString(responseRequest))
+                        .content(mapper.writeValueAsString(requestDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+        verify(itemRequestService, never()).postRequest(1, requestDto);
     }
 
     @Test
@@ -93,6 +95,7 @@ public class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(responseRequestWithItems))));
+        verify(itemRequestService).getRequestsByRequester(1);
     }
 
     @Test
@@ -110,6 +113,7 @@ public class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(content().json(mapper.writeValueAsString(List.of(responseRequestWithItems2))));
+        verify(itemRequestService).getAllRequestsByOtherUsers(1, 0, 10);
     }
 
     @Test
@@ -117,13 +121,14 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getRequestById(anyLong(), anyLong()))
                 .thenReturn(responseRequestWithItems);
 
-        mvc.perform(get("/requests/888")
+        mvc.perform(get("/requests/8")
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(responseRequestWithItems.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(responseRequestWithItems.getDescription()), String.class))
                 .andExpect(jsonPath("$.created", is(responseRequestWithItems.getCreated()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:SS")))));
+        verify(itemRequestService).getRequestById(1, 8);
     }
 
     private ItemRequest getTestItemRequest() {

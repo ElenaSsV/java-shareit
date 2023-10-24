@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.RequestBooking;
 import ru.practicum.shareit.booking.dto.ResponseBooking;
 import ru.practicum.shareit.booking.model.Booking;
@@ -27,7 +28,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -78,7 +78,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.item.id", is(responseBooking.getItem().getId()), Long.class))
                 .andExpect(jsonPath("$.status", is(responseBooking.getStatus().toString())));
 
-        verify(bookingService, times(1)).postBooking(anyLong(), any());
+        verify(bookingService).postBooking(1, bookingRequestDto);
     }
 
     @Test
@@ -100,6 +100,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.start", is(responseBooking.getStart().format(formatter))))
                 .andExpect(jsonPath("$.end", is(responseBooking.getEnd().format(formatter))))
                 .andExpect(jsonPath("$.status", is(responseBooking.getStatus().toString())));
+        verify(bookingService).updateBookingStatus(1, true, 1);
     }
 
     @Test
@@ -119,6 +120,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.start", is(responseBooking.getStart().format(formatter))))
                 .andExpect(jsonPath("$.end", is(responseBooking.getEnd().format(formatter))))
                 .andExpect(jsonPath("$.status", is(responseBooking.getStatus().toString())));
+        verify(bookingService).getBookingById(1, 99);
     }
 
     @Test
@@ -139,6 +141,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$[0].start", is(responseBooking.getStart().format(formatter))))
                 .andExpect(jsonPath("$[0].end", is(responseBooking.getEnd().format(formatter))))
                 .andExpect(jsonPath("$[0].status", is(responseBooking.getStatus().toString())));
+        verify(bookingService).getAllBookingsByBooker(BookingState.ALL, 1, 0, 10);
     }
 
     @Test
@@ -159,6 +162,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$[0].start", is(responseBooking.getStart().format(formatter))))
                 .andExpect(jsonPath("$[0].end", is(responseBooking.getEnd().format(formatter))))
                 .andExpect(jsonPath("$[0].status", is(responseBooking.getStatus().toString())));
+        verify(bookingService).getAllBookingsByItemOwner(BookingState.ALL, 1, 0, 10);
 
     }
 

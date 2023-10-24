@@ -31,7 +31,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
@@ -63,11 +63,12 @@ public class BookingServiceTest {
 
     @Test
     public void postBooking_whenIncorrectItemId_thenThrowNotFoundException() {
+        RequestBooking requestBooking = new RequestBooking(LocalDateTime.now(), LocalDateTime.now().plusDays(1), 1L);
         Mockito.when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
         NotFoundException notFoundException = assertThrows(NotFoundException.class,
-                () -> bookingService.postBooking(1, new RequestBooking(LocalDateTime.now(),
-                        LocalDateTime.now().plusDays(1), 1L)));
+                () -> bookingService.postBooking(1, requestBooking));
+        verify(bookingRepository, never()).save(Mockito.any());
     }
 
     @Test
@@ -82,6 +83,7 @@ public class BookingServiceTest {
                 testBooking.getEnd(), testBooking.getItem().getId());
         IllegalOperationException illegalOperationException = assertThrows(IllegalOperationException.class,
                 () -> bookingService.postBooking(2, requestBooking));
+        verify(bookingRepository, never()).save(Mockito.any());
     }
 
     @Test
@@ -89,15 +91,19 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findById(Mockito.anyLong())).thenThrow(NotFoundException.class);
 
         NotFoundException notFoundException = assertThrows(NotFoundException.class,
-                () -> bookingService.getBookingById(1, 5));
+                () -> bookingService.getBookingById(1, 5L));
+        verify(bookingRepository).findById(5L);
     }
 
     @Test
     public void getBookingByCorrectId() {
+        long userId = 1;
+        long bookingId = 5;
         Mockito.when(bookingRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(getTestBooking()));
 
-        Optional<ResponseBooking> booking = Optional.of(bookingService.getBookingById(1, 5));
+        Optional<ResponseBooking> booking = Optional.of(bookingService.getBookingById(userId, bookingId));
         assertEquals(BookingMapper.toResponseBooking(getTestBooking()), booking.get());
+        verify(bookingRepository).findById(bookingId);
     }
 
     @Test
@@ -115,6 +121,7 @@ public class BookingServiceTest {
                 true, booking.getId());
         ResponseBooking expected = BookingMapper.toResponseBooking(updatedBooking);
         assertEquals(expected, actual);
+        verify(bookingRepository).save(any());
     }
 
     @Test
@@ -124,6 +131,7 @@ public class BookingServiceTest {
 
         NotFoundException notFoundException = assertThrows(NotFoundException.class,
                 () -> bookingService.updateBookingStatus(99, true, 1));
+        verify(bookingRepository, never()).save(any());
     }
 
     @Test
@@ -136,6 +144,7 @@ public class BookingServiceTest {
         IllegalOperationException illegalOperationException = assertThrows(IllegalOperationException.class,
                 () -> bookingService.updateBookingStatus(booking.getItem().getOwner().getId(),
                         true, booking.getId()));
+        verify(bookingRepository, never()).save(any());
     }
 
     @Test
@@ -148,6 +157,7 @@ public class BookingServiceTest {
         IllegalOperationException illegalOperationException = assertThrows(IllegalOperationException.class,
                 () -> bookingService.updateBookingStatus(booking.getItem().getOwner().getId(),
                         false, booking.getId()));
+        verify(bookingRepository, never()).save(any());
     }
 
     @Test
@@ -176,6 +186,9 @@ public class BookingServiceTest {
                 pastBooking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(pastBooking)));
+
+        verify(bookingRepository).findByBooker_IdAndEndIsBeforeOrderByStartDesc(Mockito.anyLong(), Mockito.any(),
+                Mockito.any());
     }
 
     @Test
@@ -191,6 +204,9 @@ public class BookingServiceTest {
                 currentBooking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(currentBooking)));
+
+        verify(bookingRepository).findByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(Mockito.anyLong(), Mockito.any(), Mockito.any(),
+                Mockito.any());
     }
 
     @Test
@@ -206,6 +222,8 @@ public class BookingServiceTest {
                 futureBooking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(futureBooking)));
+
+        verify(bookingRepository).findByBooker_IdAndStartIsAfterOrderByStartDesc(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -221,6 +239,8 @@ public class BookingServiceTest {
                 bookingRejected.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(bookingRejected)));
+
+        verify(bookingRepository).findByBooker_IdAndStatusOrderByStartDesc(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -236,8 +256,9 @@ public class BookingServiceTest {
                 booking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(booking)));
-    }
 
+        verify(bookingRepository).findByBooker_IdOrderByStartDesc(Mockito.anyLong(), Mockito.any());
+    }
 
     @Test
     public void getAllBookingsByBooker_whenStateRejected() {
@@ -252,6 +273,8 @@ public class BookingServiceTest {
                 bookingWaiting.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(bookingWaiting)));
+
+        verify(bookingRepository).findByBooker_IdAndStatusOrderByStartDesc(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -260,6 +283,7 @@ public class BookingServiceTest {
 
         NotFoundException notFoundException = assertThrows(NotFoundException.class,
                 () -> bookingService.getAllBookingsByItemOwner(BookingState.ALL, 1, 0, 10));
+
     }
 
     @Test
@@ -280,6 +304,9 @@ public class BookingServiceTest {
                 pastBooking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(pastBooking)));
+
+        verify(bookingRepository).findByOwner_IdAndStatePast(Mockito.anyLong(), Mockito.any(),
+                Mockito.any());
     }
 
     @Test
@@ -295,6 +322,9 @@ public class BookingServiceTest {
                 currentBooking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(currentBooking)));
+
+        verify(bookingRepository).findByOwner_IdAndStateCurrent(Mockito.anyLong(), Mockito.any(), Mockito.any(),
+                Mockito.any());
     }
 
     @Test
@@ -310,6 +340,8 @@ public class BookingServiceTest {
                 futureBooking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(futureBooking)));
+
+        verify(bookingRepository).findByOwner_IdAndStateFuture(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -325,6 +357,8 @@ public class BookingServiceTest {
                 bookingRejected.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(bookingRejected)));
+
+        verify(bookingRepository).findByOwner_IdAndStatus(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -340,8 +374,9 @@ public class BookingServiceTest {
                 booking.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(booking)));
-    }
 
+        verify(bookingRepository).findByOwner_IdOrderByStartDesc(Mockito.anyLong(), Mockito.any());
+    }
 
     @Test
     public void getAllBookingsByItemOwner_whenStateRejected() {
@@ -356,9 +391,9 @@ public class BookingServiceTest {
                 bookingWaiting.getBooker().getId(), 0, 10);
         assertThat(actualBooking, iterableWithSize(1));
         assertThat(actualBooking, contains(BookingMapper.toResponseBooking(bookingWaiting)));
+
+        verify(bookingRepository).findByOwner_IdAndStatus(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
-
-
 
     private Booking getTestBooking() {
         Booking booking = new Booking();

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -31,7 +32,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemRequestServiceTest {
@@ -74,6 +75,7 @@ public class ItemRequestServiceTest {
         assertEquals(itemRequest.getDescription(), responseRequest.getDescription());
         assertEquals(itemRequest.getCreated(), responseRequest.getCreated());
 
+        verify(itemRequestRepository).save(Mockito.any(ItemRequest.class));
     }
 
     @Test
@@ -87,6 +89,7 @@ public class ItemRequestServiceTest {
                 () -> itemRequestService.postRequest(99, requestDto));
 
         assertEquals("User with id 99 is not found", exception.getMessage());
+        verify(itemRequestRepository, never()).save(any(ItemRequest.class));
 
     }
 
@@ -190,6 +193,7 @@ public class ItemRequestServiceTest {
         itemRequest1.setId(1L);
         itemRequest1.setDescription("Test request");
         itemRequest1.setRequestor(requestor);
+        itemRequest1.setCreated(LocalDateTime.of(2023, 10, 20, 9, 0));
         return itemRequest1;
     }
 }

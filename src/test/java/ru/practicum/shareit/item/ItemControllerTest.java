@@ -29,10 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,6 +70,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name", is(itemDto.getName())))
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
                 .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
+        verify(itemService).postItem(1, itemDto);
     }
 
     @Test
@@ -92,6 +92,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name", is(updatedItem.getName())))
                 .andExpect(jsonPath("$.description", is(updatedItem.getDescription())))
                 .andExpect(jsonPath("$.available", is(updatedItem.getAvailable())));
+        verify(itemService).partiallyUpdateItem(1, 1, updatedItem);
     }
 
     @Test
@@ -109,6 +110,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name", is(itemResponseDto.getName())))
                 .andExpect(jsonPath("$.description", is(itemResponseDto.getDescription())))
                 .andExpect(jsonPath("$.available", is(itemResponseDto.getAvailable())));
+        verify(itemService).getItemByIdAnyUser(1, 1);
     }
 
     @Test
@@ -118,13 +120,16 @@ public class ItemControllerTest {
 
         mvc.perform(get("/items/search")
                         .header("X-Sharer-User-Id", 1)
-                        .param("text", "test"))
+                        .param("text", "test")
+                        .param("from", "0")
+                        .param("size", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].name", is(itemDto.getName())))
                 .andExpect(jsonPath("$[0].description", is(itemDto.getDescription())))
                 .andExpect(jsonPath("$[0].available", is(itemDto.getAvailable())));
+        verify(itemService).searchItem(1, "test", 0, 5);
     }
 
     @Test
@@ -133,8 +138,10 @@ public class ItemControllerTest {
                 .thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items/search")
+                        .header("X-Sharer-User-Id", 1)
                         .param("text", ""))
                 .andExpect(status().isInternalServerError());
+        verify(itemService, never()).searchItem(1, "", 0, 10);
     }
 
     @Test
@@ -154,6 +161,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$[0].name", is(responseDto.getName())))
                 .andExpect(jsonPath("$[0].description", is(responseDto.getDescription())))
                 .andExpect(jsonPath("$[0].available", is(responseDto.getAvailable())));
+        verify(itemService).getAllItemsOwner(1, 0, 10);
     }
 
     @Test
@@ -175,6 +183,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.authorName", is(commentDto.getAuthorName())))
                 .andExpect(jsonPath("$.created", is(commentDto.getCreated().format(
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")))));
+        verify(itemService).postComment(1, 1, commentDto);
     }
 
     private Item getTestItem() {

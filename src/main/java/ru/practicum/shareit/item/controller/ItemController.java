@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.dto.ItemWithBookingsAndComments;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
+import javax.validation.ValidationException;
 import java.util.List;
 
 /**
@@ -53,8 +53,8 @@ public class ItemController {
     @GetMapping
     public List<ItemWithBookingsAndComments> getAllItems(@RequestHeader(value = "X-Sharer-User-Id", required = true)
                                                             long userId,
-                                                         @Positive @RequestParam(defaultValue = "0") int from,
-                                                         @Positive @RequestParam(defaultValue = "10")
+                                                         @RequestParam(defaultValue = "0") int from,
+                                                         @RequestParam(defaultValue = "10")
                                                              int size) {
         return itemService.getAllItemsOwner(userId, from, size);
     }
@@ -62,8 +62,11 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
                                     @RequestParam (required = true)  String text,
-                                    @Positive @RequestParam(defaultValue = "0") int from,
-                                    @Positive @RequestParam(defaultValue = "10") int size) {
+                                    @RequestParam(defaultValue = "0") int from,
+                                    @RequestParam(defaultValue = "10") int size) {
+        if (text.isEmpty() || text.isBlank()) {
+            throw new ValidationException("Text cannot be empty");
+        }
         return itemService.searchItem(userId, text, from, size);
     }
 }
