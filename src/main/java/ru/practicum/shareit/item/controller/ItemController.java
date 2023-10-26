@@ -51,13 +51,18 @@ public class ItemController {
 
     @GetMapping
     public List<ItemWithBookingsAndComments> getAllItems(@RequestHeader(value = "X-Sharer-User-Id", required = true)
-                                                            long userId) {
-        return itemService.getAllItemsOwner(userId);
+                                                            long userId,
+                                                         @RequestParam(defaultValue = "0") int from,
+                                                         @RequestParam(defaultValue = "10")
+                                                             int size) {
+        return itemService.getAllItemsOwner(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) long userId,
-                                    @RequestParam (required = true)  String text) {
-        return itemService.searchItem(userId, text);
+    public List<ItemDto> searchItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
+                                    @RequestParam (required = true)  String text,
+                                    @RequestParam(defaultValue = "0") int from,
+                                    @RequestParam(defaultValue = "10") int size) {
+        return itemService.searchItem(userId, text, from, size);
     }
 }

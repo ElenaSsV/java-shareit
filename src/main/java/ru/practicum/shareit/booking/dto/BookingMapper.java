@@ -12,6 +12,7 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingMapper {
+
     public static Booking toBooking(RequestBooking bookingDto) {
         Booking booking = new Booking();
         booking.setStart(bookingDto.getStart());
